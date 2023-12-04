@@ -1,26 +1,25 @@
-resource "azurerm_resource_group" "this" {
+data "azurerm_resource_group" "this" {
   name     = "usenet-social"
-  location = "uksouth"
 }
 
 resource "azurerm_virtual_network" "this" {
   name                = "usenet-social-vnet"
   address_space       = ["192.168.10.0/24"]
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
 }
 
 resource "azurerm_subnet" "this" {
   name                 = "usenet-social-subnet"
-  resource_group_name  = azurerm_resource_group.this.name
+  resource_group_name  = data.azurerm_resource_group.this.name
   virtual_network_name = azurerm_virtual_network.this.name
   address_prefixes     = ["192.168.10.0/25"]
 }
 
 resource "azurerm_network_security_group" "this" {
   name                = "usenet-social-nsg"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
 }
 
 # allow ssh 
@@ -34,7 +33,7 @@ resource "azurerm_network_security_rule" "ssh" {
   destination_port_range      = "22"
   source_address_prefix       = "185.214.222.183"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.this.name
+  resource_group_name         = data.azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.this.name
 }
 #allow nntp 
@@ -48,7 +47,7 @@ resource "azurerm_network_security_rule" "nntp" {
   destination_port_range      = "119"
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
-  resource_group_name         = azurerm_resource_group.this.name
+  resource_group_name         = data.azurerm_resource_group.this.name
   network_security_group_name = azurerm_network_security_group.this.name
 }
 
@@ -56,8 +55,8 @@ resource "azurerm_network_security_rule" "nntp" {
 
 resource "azurerm_network_interface" "this" {
   name                = "usenet-social-nic"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
 
   ip_configuration {
     name                          = "usenet-social-nic-ip"
@@ -71,8 +70,8 @@ resource "azurerm_network_interface" "this" {
 
 resource "azurerm_public_ip" "this" {
   name                = "usenet-social-pip"
-  location            = azurerm_resource_group.this.location
-  resource_group_name = azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
   allocation_method   = "Dynamic"
 }
 
@@ -86,8 +85,8 @@ resource "random_id" "this" {
 
 resource "azurerm_storage_account" "this" {
   name                     = substr(lower("usenetsocial${random_id.this.hex}"),0,23)
-  resource_group_name      = azurerm_resource_group.this.name
-  location                 = azurerm_resource_group.this.location
+  resource_group_name      = data.azurerm_resource_group.this.name
+  location                 = data.azurerm_resource_group.this.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
@@ -99,8 +98,8 @@ resource "azurerm_storage_account" "this" {
 resource "azurerm_linux_virtual_machine" "this" {
   name                = var.vm_name
   computer_name       = var.vm_name
-  resource_group_name = azurerm_resource_group.this.name
-  location            = azurerm_resource_group.this.location
+  resource_group_name = data.azurerm_resource_group.this.name
+  location            = data.azurerm_resource_group.this.location
   size                = var.vm_size_map[var.vm_tshirt_size]
   admin_username      = var.vm_username
   custom_data           = data.template_cloudinit_config.this.rendered
@@ -146,6 +145,7 @@ resource "azurerm_dns_a_record" "this" {
   resource_group_name = data.azurerm_resource_group.dns.name
   ttl                 = 300
   records             = [azurerm_public_ip.this.ip_address]
+  depends_on = [ azurerm_linux_virtual_machine.this ]
 }
 
 data "template_file" "this" {
