@@ -85,7 +85,7 @@ resource "random_id" "this" {
 # diagnostics storage account
 
 resource "azurerm_storage_account" "this" {
-  name                     = lower("usenetsocial${random_id.this.hex}")
+  name                     = subst(lower("usenetsocial${random_id.this.hex}"),0,23)
   resource_group_name      = azurerm_resource_group.this.name
   location                 = azurerm_resource_group.this.location
   account_tier             = "Standard"
