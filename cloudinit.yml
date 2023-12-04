@@ -1,0 +1,9 @@
+package_update: true
+package_upgrade: true
+packages:
+  - git
+  - python3-pip
+  - inn2 
+
+runcmd:
+  - init 6 # reboot
