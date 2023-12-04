@@ -137,15 +137,23 @@ data "azurerm_dns_zone" "this" {
   resource_group_name = data.azurerm_resource_group.dns.name
 }
 
-# create dns record
+# sleep for 1 minute to allow vm to boot
+resource "null_resource" "this" {
+  provisioner "local-exec" {
+    command = "sleep 60"
+  }
+  depends_on = [ azurerm_linux_virtual_machine.this ]
+}
 
+
+# create dns record
 resource "azurerm_dns_a_record" "this" {
   name                = "news"
   zone_name           = data.azurerm_dns_zone.this.name
   resource_group_name = data.azurerm_resource_group.dns.name
   ttl                 = 300
   records             = [azurerm_public_ip.this.ip_address]
-  depends_on = [ azurerm_linux_virtual_machine.this ]
+  depends_on = [ null_resource.this ]
 }
 
 data "template_file" "this" {

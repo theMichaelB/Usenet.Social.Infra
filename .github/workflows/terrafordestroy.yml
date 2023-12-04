@@ -38,11 +38,6 @@ jobs:
     - name: Terraform Init
       run: terraform init
 
-
-    # Generates an execution plan for Terraform
-    - name: Terraform Plan
-      run: terraform plan -input=false -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
-
       # On push to "main", build or change infrastructure according to Terraform configuration files
-    - name: Terraform Apply
-      run: terraform apply -auto-approve -var "ssh_public_key=${{ secrets.SSH_PUBLIC_KEY }}"
+    - name: Terraform destroy
+      run: terraform destroy -auto-approve 
