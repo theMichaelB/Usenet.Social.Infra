@@ -151,8 +151,7 @@ resource "azurerm_dns_a_record" "this" {
   zone_name           = data.azurerm_dns_zone.this.name
   resource_group_name = data.azurerm_resource_group.dns.name
   ttl                 = 300
-  records             = [azurerm_public_ip.this.ip_address]
-  depends_on = [ data.azurerm_public_ip.this ]
+  records             = [data.azurerm_public_ip.this.ip_address]
 }
 
 data "template_file" "this" {
