@@ -132,18 +132,18 @@ data "azurerm_resource_group" "dns" {
   name = "DNS-Zones"
 }
 
+
+data "azurerm_network_interface" "this" {
+  name                = "usenet-social-nic"
+  resource_group_name = data.azurerm_resource_group.this.name
+  depends_on = [ azurerm_linux_virtual_machine.this ]
+}
+
 data "azurerm_dns_zone" "this" {
   name                = "usenet.social"
   resource_group_name = data.azurerm_resource_group.dns.name
 }
 
-# sleep for 1 minute to allow vm to boot
-resource "null_resource" "this" {
-  provisioner "local-exec" {
-    command = "sleep 60"
-  }
-  depends_on = [ azurerm_linux_virtual_machine.this ]
-}
 
 
 # create dns record
@@ -153,7 +153,7 @@ resource "azurerm_dns_a_record" "this" {
   resource_group_name = data.azurerm_resource_group.dns.name
   ttl                 = 300
   records             = [azurerm_public_ip.this.ip_address]
-  depends_on = [ null_resource.this ]
+  depends_on = [ data.azurerm_public_ip.this ]
 }
 
 data "template_file" "this" {
