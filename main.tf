@@ -134,7 +134,7 @@ data "azurerm_resource_group" "dns" {
 
 data "azurerm_public_ip" "this" {
   name                = "usenet-social-pip"
-  resource_group_name = data.azurerm_resource_group.dns.name
+  resource_group_name = data.azurerm_resource_group.this.name
   depends_on = [ azurerm_linux_virtual_machine.this ]
 }
 
