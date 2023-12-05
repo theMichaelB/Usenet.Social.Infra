@@ -132,11 +132,9 @@ data "azurerm_resource_group" "dns" {
   name = "DNS-Zones"
 }
 
-
-data "azurerm_network_interface" "this" {
-  name                = "usenet-social-nic"
-  resource_group_name = data.azurerm_resource_group.this.name
-  depends_on = [ azurerm_linux_virtual_machine.this ]
+data "azurerm_public_ip" "this" {
+  name                = "usenet-social-pip"
+  resource_group_name = data.azurerm_resource_group.dns.name
 }
 
 data "azurerm_dns_zone" "this" {
