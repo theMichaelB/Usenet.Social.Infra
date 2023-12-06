@@ -1,5 +1,5 @@
 data "azurerm_resource_group" "this" {
-  name     = "usenet-social"
+  name = "usenet-social"
 }
 
 resource "azurerm_virtual_network" "this" {
@@ -84,13 +84,19 @@ resource "random_id" "this" {
 # diagnostics storage account
 
 resource "azurerm_storage_account" "this" {
-  name                     = substr(lower("usenetsocial${random_id.this.hex}"),0,23)
+  name                     = substr(lower("usenetsocial${random_id.this.hex}"), 0, 23)
   resource_group_name      = data.azurerm_resource_group.this.name
   location                 = data.azurerm_resource_group.this.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
 }
 
+
+# get user assigned identity
+data "azurerm_user_assigned_identity" "this" {
+  name                = "News-Server"
+  resource_group_name = data.azurerm_resource_group.this.name
+}
 
 
 # create vm
@@ -102,7 +108,7 @@ resource "azurerm_linux_virtual_machine" "this" {
   location            = data.azurerm_resource_group.this.location
   size                = var.vm_size_map[var.vm_tshirt_size]
   admin_username      = var.vm_username
-  custom_data           = data.template_cloudinit_config.this.rendered
+  custom_data         = data.template_cloudinit_config.this.rendered
   network_interface_ids = [
     azurerm_network_interface.this.id,
   ]
@@ -120,10 +126,17 @@ resource "azurerm_linux_virtual_machine" "this" {
     sku       = "12-gen2"
     version   = "latest"
   }
-    boot_diagnostics {
-        storage_account_uri = azurerm_storage_account.this.primary_blob_endpoint
+  boot_diagnostics {
+    storage_account_uri = azurerm_storage_account.this.primary_blob_endpoint
 
-    }
+  }
+  identity {
+    type = "userAssigned"
+    identity_ids = [
+      data.azurerm_user_assigned_identity.this.id,
+    ]
+
+  }
 }
 
 # add data for dns zone
@@ -135,7 +148,7 @@ data "azurerm_resource_group" "dns" {
 data "azurerm_public_ip" "this" {
   name                = "usenet-social-pip"
   resource_group_name = data.azurerm_resource_group.this.name
-  depends_on = [ azurerm_linux_virtual_machine.this ]
+  depends_on          = [azurerm_linux_virtual_machine.this]
 }
 
 data "azurerm_dns_zone" "this" {
