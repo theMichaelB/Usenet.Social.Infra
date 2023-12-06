@@ -6,4 +6,6 @@ packages:
   - inn2 
 
 runcmd:
+  - mkdir -p /data/dev/
+  - chown -R debian:debian /data/dev/
   - init 6 # reboot

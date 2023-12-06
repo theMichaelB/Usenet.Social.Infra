@@ -168,7 +168,7 @@ resource "azurerm_dns_a_record" "this" {
 }
 
 data "template_file" "this" {
-  template = file("cloudinit.yml")
+  template = file("data/cloudinit.yml")
 
 }
 
