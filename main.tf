@@ -131,7 +131,7 @@ resource "azurerm_linux_virtual_machine" "this" {
 
   }
   identity {
-    type = "userAssigned"
+    type = "UserAssigned"
     identity_ids = [
       data.azurerm_user_assigned_identity.this.id,
     ]
