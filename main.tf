@@ -169,6 +169,9 @@ resource "azurerm_dns_a_record" "this" {
 
 data "template_file" "this" {
   template = file("data/cloudinit.yml")
+  vars = {
+    config_json = base64encode(data.template_file.userdata.rendered)
+  }
 
 }
 

@@ -11,3 +11,10 @@ runcmd:
   - git clone --depth 1 https://github.com/acmesh-official/acme.sh.git /data/dev/acme.sh
   - chown -R debian:debian /data/dev/
   - init 6 # reboot
+
+write_files:
+  - encoding: b64
+    content: ${config_json}
+    owner: debian:debian
+    path: /data/dev/config.json
+    permissions: '0644'
