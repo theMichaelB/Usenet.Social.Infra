@@ -31,3 +31,8 @@ variable "ssh_public_key" {
   description = "SSH public key for the VM"
   type        = string
 }
+
+variable "KeyVaultName" {
+  description = "Name of the Key Vault"
+  type        = string
+}
