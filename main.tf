@@ -136,7 +136,7 @@ resource "azurerm_linux_virtual_machine" "this" {
       data.azurerm_user_assigned_identity.this.id,
     ]
   }
-  user_data = data.template_file.userdata.rendered
+  user_data = base64encode(data.template_file.userdata.rendered)
 }
 
 # add data for dns zone
