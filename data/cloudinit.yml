@@ -3,7 +3,7 @@ package_upgrade: true
 packages:
   - git
   - python3-pip
-  - inn2 
+  #- inn2 
 
 runcmd:
   - mkdir -p /data/dev/
