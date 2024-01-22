@@ -94,7 +94,7 @@ resource "azurerm_storage_account" "this" {
 
 # get user assigned identity
 data "azurerm_user_assigned_identity" "this" {
-  name                = "News-Server"
+  name                = "usenet-social-mi"
   resource_group_name = data.azurerm_resource_group.this.name
 }
 
